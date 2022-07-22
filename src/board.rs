@@ -1,84 +1,67 @@
 use std::fmt;
-use crate::board::Piece::*;
+use std::fmt::Formatter;
+use crate::piece::*;
+use crate::piece::{Position, Piece, Piece::*, Color::*};
+use crate::square::Square;
+pub const WHITE: Color = White;
+pub const BLACK: Color = Black;
 
-#[derive(Copy, Clone)]
-pub enum Piece {
-  King,
-  Queen,
-  Rook,
-  Knight,
-  Bishop,
-  Pawn,
-}
-
-#[derive(Copy, Clone)]
-struct Square { piece: Option<Piece> }
-
-impl Square {
-  pub fn new() -> Square {
-    Square { piece: None}
-  }
-
-  fn symbol(&self) -> &str {
-    match self.piece {
-      Some(King) => " K ",
-      Some(Queen) => " Q ",
-      Some(Rook) => " R ",
-      Some(Bishop) => " B ",
-      Some(Knight) => " N ",
-      Some(Pawn) => " P ",
-      None => "___"
-    }
-  }
-}
-
-impl fmt::Display for Square {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", self.symbol())
-  }
-}
+#[derive(Debug)]
 pub struct Board {
-  squares: [[Square; 8]; 8]
+  squares: [[Square; 8]; 8],
+  turn: Color,
 }
 
 impl Board {
   pub fn new() -> Board {
-    let mut squares = [[Square { piece: None }; 8]; 8];
+    let mut squares = [[Square {piece: None };8]; 8];
     for x in 0..8 {
-      squares[1][x].piece = Some(Pawn);
-      squares[6][x].piece = Some(Pawn);
-      let piece = match x {
-        0 | 7 => Some(Rook),
-        1 | 6 => Some(Knight),
-        2 | 5 => Some(Bishop),
-        3 => Some(King),
-        4 => Some(Queen),
+      squares[1][x]
+          .piece = Some(Pawn(WHITE));
+      squares[6][x]
+          .piece = Some(Pawn(BLACK));
+      squares[0][x].piece = match x {
+        0 => Some(Rook(WHITE)),
+        1 => Some(Knight(WHITE)),
+        2 => Some(Bishop(WHITE)),
+        3 => Some(King(WHITE)),
+        4 => Some(Queen(WHITE)),
+        5 => Some(Bishop(WHITE)),
+        6 => Some(Knight(WHITE)),
+        7 => Some(Rook(WHITE)),
         _ => unreachable!(),
       };
-      squares[0][x].piece = piece;
-      squares[7][x].piece = piece;
+      squares[7][x].piece = match x {
+        0 => Some(Rook(BLACK)),
+        1 => Some(Knight(BLACK)),
+        2 => Some(Bishop(BLACK)),
+        3 => Some(King(BLACK)),
+        4 => Some(Queen(BLACK)),
+        5 => Some(Bishop(BLACK)),
+        6 => Some(Knight(BLACK)),
+        7 => Some(Rook(BLACK)),
+        _ => unreachable!(),
+      };
+
     }
     Board {
-      squares
+      squares,
+      turn: White
     }
-  }
-
-  pub fn valid() {
-
   }
 }
 
 impl fmt::Display for Board {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+  fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
     let mut res = String::new();
     for row in 0..8 {
       for col in 0..8 {
         res.push_str("|");
-        res.push_str(self.squares[row][col].symbol());
-        res.push_str("|");
+        res.push_str(self.squares[row][col].get_sym());
+        res.push_str("|")
       }
       res.push_str("\n");
     }
-    write!(f, "{}", res)
+    write!(f,"{}", res)
   }
 }
