@@ -1,7 +1,11 @@
+
+//mod game;
 mod board;
-use board::*;
+mod piece;
+mod square;
+
 fn main() {
-    let board = Board::new();
+    let board = board::Board::new();
     println!("{}", board);
 }
 
